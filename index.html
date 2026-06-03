@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ProformaExpress</title>
+
+    <!-- Nuevo Script Oficial de Tailwind CSS v4 Play CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+
+<body class="bg-slate-50 font-sans antialiased text-slate-800 min-h-screen">
+
+    <!-- Tarjeta tipo App Móvil -->
+    <main
+        class="w-full min-h-screen md:min-h-0 md:max-w-md md:mx-auto md:my-8 bg-white md:rounded-2xl md:shadow-xl p-5">
+
+        <!-- Encabezado -->
+        <header class="border-b border-slate-100 pb-4 mb-6 text-center">
+            <h1 class="text-2xl font-black tracking-tight text-indigo-600">ProformaExpress</h1>
+            <p class="text-slate-400 text-xs mt-0.5 font-medium tracking-wide uppercase">Generador de Cotizaciones</p>
+        </header>
+
+        <!-- SECCIÓN 1: DATOS DE MI EMPRESA -->
+        <section class="mb-6 bg-slate-50/50 p-4 rounded-xl border border-slate-100">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-1 rounded">01</span>
+                <h2 class="text-base font-bold text-slate-700">Mi Empresa</h2>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Nombre
+                        Comercial</label>
+                    <input type="text" placeholder="Ej. Servicios Globales S.A."
+                        class="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Cédula
+                        Jurídica</label>
+                    <input type="text" placeholder="Ej. 3-101-XXXXXX"
+                        class="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all">
+                </div>
+                <div>
+                    <label
+                        class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Teléfono</label>
+                    <input type="tel" placeholder="Ej. +506 8888-8888"
+                        class="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Dirección
+                        Física</label>
+                    <textarea rows="2" placeholder="Ej. San José, Costa Rica"
+                        class="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all resize-none"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: DATOS DEL CLIENTE -->
+        <section class="mb-6 bg-slate-50/50 p-4 rounded-xl border border-slate-100">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-1 rounded">02</span>
+                    <h2 class="text-base font-bold text-slate-700">Datos del Cliente</h2>
+                </div>
+                <button type="button" id="btn-limpiar-cliente"
+                    class="text-xs font-bold text-emerald-600 active:text-emerald-800 bg-emerald-50 px-2.5 py-1.5 rounded-lg border border-emerald-100 transition-all cursor-pointer">
+                    Limpiar
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Campo de búsqueda inteligente de cliente -->
+                <div class="relative">
+                    <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Buscar o
+                        Escribir Cliente</label>
+                    <input type="text" id="cliente-nombre" placeholder="Escribe el nombre para buscar o crear..."
+                        class="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all"
+                        autocomplete="off">
+
+                    <!-- Panel flotante oculto para autocompletar clientes de la base de datos -->
+                    <div id="sugerencias-cliente"
+                        class="hidden absolute left-0 right-0 top-[102%] bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-48 overflow-y-auto divide-y divide-slate-100">
+                        <!-- Aquí la base de datos inyectará las filas de clientes que coincidan -->
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Cédula
+                        Comercial / Personal</label>
+                    <input type="text" id="cliente-cedula" placeholder="Cédula Jurídica o ID"
+                        class="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all">
+                </div>
+                <div>
+                    <label
+                        class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Teléfono</label>
+                    <input type="tel" id="cliente-telefono" placeholder="Número telefónico"
+                        class="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Correo
+                        Electrónico</label>
+                    <input type="email" id="cliente-email" placeholder="cliente@correo.com"
+                        class="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1 uppercase tracking-wider">Dirección de
+                        Entrega</label>
+                    <textarea id="cliente-direccion" rows="2" placeholder="Dirección exacta del cliente"
+                        class="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition-all resize-none"></textarea>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- AQUÍ ENCAJARÁ EL SIGUIENTE BLOQUE (DATOS DE PRODUCTOS) -->
+        <section class="mb-6 bg-slate-50/50 p-4 rounded-xl border border-slate-100">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="bg-amber-100 text-amber-700 text-xs font-bold px-2 py-1 rounded">03</span>
+                <h2 class="text-base font-bold text-slate-700">Agregar Producto / Servicio</h2>
+            </div>
+
+            <div class="space-y-4">
+                <!-- AJUSTE: El bloque de Moneda y Tipo de Cambio ahora corona el inicio del catálogo -->
+                <div class="grid grid-cols-2 gap-3 bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
+                    <div>
+                        <label
+                            class="block text-[10px] font-semibold text-slate-500 mb-1 uppercase tracking-wider">Moneda
+                            Doc.</label>
+                        <select id="config-moneda"
+                            class="w-full px-2 py-2 bg-slate-50 border border-slate-200 rounded-md text-xs text-slate-800 font-bold focus:outline-none cursor-pointer">
+                            <option value="USD">Dólares ($)</option>
+                            <option value="CRC">Colones (₡)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label
+                            class="block text-[10px] font-semibold text-slate-500 mb-1 uppercase tracking-wider">Valor
+                            de Cambio</label>
+                        <input type="number" id="config-tipo-cambio" value="520"
+                            class="w-full px-2 py-2 bg-slate-50 border border-slate-200 rounded-md text-xs text-slate-800 focus:outline-none"
+                            placeholder="Ej: 520">
+                    </div>
+                </div>
+
+                <!-- Buscador predictivo -->
+                <div class="relative">
+                    <label class="block text-[10px] font-semibold text-slate-500 mb-1 uppercase tracking-wider">Buscar
+                        por Código o Descripción</label>
+                    <input type="text" id="prod-buscador" placeholder="Escribe código o descripción para buscar..."
+                        class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100 transition-all"
+                        autocomplete="off">
+                    <div id="sugerencias-producto"
+                        class="hidden absolute left-0 right-0 top-[102%] bg-white border border-slate-200 rounded-xl shadow-xl z-50 max-h-48 overflow-y-auto divide-y divide-slate-100">
+                    </div>
+                </div>
+
+                <!-- Campos de solo lectura -->
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label
+                            class="block text-[10px] font-semibold text-slate-500 mb-1 uppercase tracking-wider">Código</label>
+                        <input type="text" id="prod-codigo" placeholder="P001"
+                            class="w-full px-3 py-2.5 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-500 focus:outline-none"
+                            readonly>
+                    </div>
+                    <div class="col-span-2">
+                        <label
+                            class="block text-[10px] font-semibold text-slate-500 mb-1 uppercase tracking-wider">Descripción</label>
+                        <input type="text" id="prod-descripcion" placeholder="Artículo o servicio"
+                            class="w-full px-3 py-2.5 bg-slate-100 border border-slate-200 rounded-lg text-sm text-slate-500 focus:outline-none"
+                            readonly>
+                    </div>
+                </div>
+
+                <!-- Parámetros específicos de la línea -->
+                <div class="grid grid-cols-4 gap-2">
+                    <div>
+                        <label
+                            class="block text-[10px] font-semibold text-slate-500 mb-1 uppercase tracking-wider">Precio</label>
+                        <input type="number" id="prod-precio" placeholder="0.00"
+                            class="w-full px-2 py-2.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-amber-500 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-semibold text-slate-500 mb-1 uppercase tracking-wider">Desc
+                            (%)</label>
+                        <input type="number" id="prod-descuento" placeholder="0" min="0" max="100" value="0"
+                            class="w-full px-2 py-2.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-rose-600 focus:outline-none focus:border-rose-500 transition-all">
+                    </div>
+                    <div>
+                        <label
+                            class="block text-[10px] font-semibold text-slate-500 mb-1 uppercase tracking-wider">Cant.</label>
+                        <input type="number" id="prod-cantidad" placeholder="1" min="1" value="1"
+                            class="w-full px-2 py-2.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-amber-500 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-semibold text-slate-500 mb-1 uppercase tracking-wider">IV
+                            (%)</label>
+                        <input type="number" id="prod-iv-porcentaje" min="0" max="100" value="13"
+                            class="w-full px-2 py-2.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-purple-700 focus:outline-none focus:border-purple-500 transition-all">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-semibold text-slate-500 mb-1 uppercase tracking-wider">Imagen
+                        del Producto (Opcional)</label>
+                    <input type="file" id="prod-imagen" accept="image/*"
+                        class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 cursor-pointer">
+                </div>
+
+                <button type="button" id="btn-agregar-producto"
+                    class="w-full py-3 bg-amber-500 active:bg-amber-600 text-white font-bold text-sm rounded-lg shadow-md shadow-amber-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                    <span>+ Añadir a la Proforma</span>
+                </button>
+            </div>
+
+            <!-- Listado dinámico de items -->
+            <div class="mt-6 border-t border-slate-200/60 pt-4">
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Items en esta cotización</h3>
+                <div id="mensaje-vacio-productos"
+                    class="text-center py-6 bg-slate-100/50 rounded-lg border border-dashed border-slate-200 text-xs text-slate-400 font-medium">
+                    No has agregado productos todavía
+                </div>
+                <div id="lista-productos" class="hidden space-y-2"></div>
+            </div>
+        </section>
+        <!-- SECCIÓN 4: CONDICIONES Y DISEÑO (OPTIMIZADA - PARTE 2 DE 2) -->
+        <section class="mb-6 bg-slate-50/50 p-4 rounded-xl border border-slate-100">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded">04</span>
+                <h2 class="text-base font-bold text-slate-700">Condiciones y Ajustes</h2>
+            </div>
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label
+                            class="block text-[10px] font-semibold text-slate-500 mb-1 uppercase tracking-wider">Términos
+                            de Pago</label>
+                        <select id="condicion-pago"
+                            class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-purple-500 transition-all appearance-none cursor-pointer">
+                            <option value="Contado">Contado</option>
+                            <option value="Crédito">Crédito</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label
+                            class="block text-[10px] font-semibold text-slate-500 mb-1 uppercase tracking-wider">Vigencia
+                            (Días)</label>
+                        <input type="number" id="condicion-vigencia" placeholder="15" value="15"
+                            class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-purple-500 transition-all">
+                    </div>
+                </div>
+
+                <!-- AJUSTE: El cuadro antiguo del IV y el botón morado obsoleto han sido eliminados de aquí -->
+
+                <div>
+                    <label class="block text-[10px] font-semibold text-slate-500 mb-1 uppercase tracking-wider">Garantía
+                        y Políticas de Envío</label>
+                    <textarea id="condicion-politicas" rows="2" placeholder="Ej. Garantía de 3 meses. Envío gratis."
+                        class="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-purple-500 transition-all resize-none"></textarea>
+                </div>
+
+                <!-- Selector de Plantillas Visuales -->
+                <div class="border-t border-slate-200/60 pt-4">
+                    <label
+                        class="block text-[10px] font-semibold text-slate-500 mb-2 uppercase tracking-wider">Selecciona
+                        el Formato PDF</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="plantilla-formato" value="moderna" checked class="peer sr-only">
+                            <div
+                                class="text-center p-3 bg-white border border-slate-200 rounded-xl peer-checked:border-purple-500 peer-checked:bg-purple-50/50 peer-checked:text-purple-700 transition-all shadow-sm">
+                                <p class="text-xs font-bold">Moderna</p>
+                                <span class="text-[9px] text-slate-400 block mt-0.5">Minimal Color</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="plantilla-formato" value="clasica" class="peer sr-only">
+                            <div
+                                class="text-center p-3 bg-white border border-slate-200 rounded-xl peer-checked:border-purple-500 peer-checked:bg-purple-50/50 peer-checked:text-purple-700 transition-all shadow-sm">
+                                <p class="text-xs font-bold">Clásica</p>
+                                <span class="text-[9px] text-slate-400 block mt-0.5">Corporativa</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="plantilla-formato" value="limpia" class="peer sr-only">
+                            <div
+                                class="text-center p-3 bg-white border border-slate-200 rounded-xl peer-checked:border-purple-500 peer-checked:bg-purple-50/50 peer-checked:text-purple-700 transition-all shadow-sm">
+                                <p class="text-xs font-bold">Limpia</p>
+                                <span class="text-[9px] text-slate-400 block mt-0.5">Elegante</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NUEVA SUB-TARJETA: Resumen de Totales antes de Generar -->
+        <section id="tarjeta-totales" class="mb-6 bg-slate-900 text-white p-4 rounded-xl shadow-md hidden">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Resumen de Importes</h3>
+            <div class="space-y-2 text-xs">
+                <div class="flex justify-between text-slate-300"><span>Subtotal Bruto:</span><span
+                        id="tot-subtotal">0.00</span></div>
+                <div class="flex justify-between text-rose-400 font-medium"><span>Suma de Descuentos:</span><span
+                        id="tot-descuento">0.00</span></div>
+                <div class="flex justify-between text-purple-400 font-medium"><span>Suma Acumulada de IV:</span><span
+                        id="tot-iv-monto">0.00</span></div>
+                <div class="flex justify-between text-sm font-black text-white pt-2 border-t border-slate-800">
+                    <span>TOTAL COTIZACIÓN:</span><span id="tot-final">0.00</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 5: HISTORIAL / DUPLICADOR (BASE DE DATOS) -->
+        <section class="mb-6 bg-slate-50/50 p-4 rounded-xl border border-slate-100">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded">05</span>
+                <h2 class="text-base font-bold text-slate-700">Duplicar Cotización Anterior</h2>
+            </div>
+
+            <div class="space-y-3">
+                <div class="relative">
+                    <label class="block text-[10px] font-semibold text-slate-500 mb-1 uppercase tracking-wider">Buscar
+                        por Nº Proforma o Cliente</label>
+                    <input type="text" id="historial-buscador" placeholder="Ej. Proforma 105 o Nombre Cliente..."
+                        class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"
+                        autocomplete="off">
+                </div>
+
+                <!-- Lista de resultados compacta (Solo se muestra al buscar) -->
+                <div id="historial-resultados"
+                    class="hidden max-h-40 overflow-y-auto border border-slate-200 rounded-xl bg-white divide-y divide-slate-100">
+                    <!-- Filas inyectadas por JS al dar clic en buscar -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ACCIONES PRINCIPALES (BOTONES FLOTANTES DE LA APP) -->
+        <div class="space-y-2 mt-8">
+            <!-- Botón 1: Generar PDF -->
+            <button id="btn-generar" type="button"
+                class="w-full py-4 bg-indigo-600 active:bg-indigo-700 text-white font-black text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider">
+                Generar Proforma PDF
+            </button>
+
+            <!-- Botón 2: Compartir por WhatsApp (Inicialmente deshabilitado o secundario) -->
+            <button id="btn-whatsapp" type="button"
+                class="w-full py-4 bg-emerald-600 active:bg-emerald-700 text-white font-black text-sm rounded-xl shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer uppercase tracking-wider">
+                Compartir por WhatsApp
+            </button>
+        </div>
+
+
+    </main>
+    <!-- SECCIÓN DE INTELIGENCIA DE LA APP (JAVASCRIPT) -->
+
+    <script>
+        // === 1. DATOS DE SIMULACIÓN (Estructura de Base de Datos Temporal) ===
+        const BD_CLIENTES = [
+            { nombre: "Corporación Alfa S.A.", cedula: "3-101-554422", telefono: "+506 8888-1111", email: "compras@alfa.com", direccion: "San José, de la catedral 200m Este" },
+            { nombre: "Distribuidora Juan Pérez", cedula: "1-1052-0364", telefono: "+506 7777-2222", email: "juan@perez.com", direccion: "Limón, Guápiles central" },
+            { nombre: "Talleres del Norte", cedula: "3-102-998877", telefono: "+506 2255-4433", email: "info@talleresnorte.com", direccion: "Alajuela, frente al parque" }
+        ];
+
+        const BD_PRODUCTOS = [
+            { codigo: "PROD-001", descripcion: "Consultoría Profesional por Hora", precio: 50, monedaBase: "USD" },
+            { codigo: "PROD-002", descripcion: "Licencia de Software Anual", precio: 250, monedaBase: "USD" },
+            { codigo: "PROD-003", descripcion: "Mantenimiento Preventivo de Equipos", precio: 45000, monedaBase: "CRC" },
+            { codigo: "ART-105", descripcion: "Cable de Red Cat6 (Metro)", precio: 1500, monedaBase: "CRC" }
+        ];
+
+        const BD_HISTORIAL = [
+            { id: "PRO-1001", cliente: "Corporación Alfa S.A.", fecha: "28/05/2026", total: 150 },
+            { id: "PRO-1002", cliente: "Talleres del Norte", fecha: "01/06/2026", total: 720 }
+        ];
+
+        let productosCotizacion = [];
+        let monedaArticuloSeleccionado = "USD";
+
+        // === 2. GESTIÓN PREDICTIVA DE CLIENTES ===
+        const inputCliente = document.getElementById('cliente-nombre');
+        const panelClientes = document.getElementById('sugerencias-cliente');
+
+        inputCliente.addEventListener('input', (e) => {
+            const buscar = e.target.value.toLowerCase().trim();
+            if (buscar.length < 2) { panelClientes.classList.add('hidden'); return; }
+            const filtrados = BD_CLIENTES.filter(c => c.nombre.toLowerCase().includes(buscar));
+            if (filtrados.length > 0) {
+                panelClientes.innerHTML = filtrados.map(c => `
+                    <div class="p-3 hover:bg-slate-50 cursor-pointer text-sm text-slate-700" 
+                         onclick="seleccionarCliente('${c.nombre}', '${c.cedula}', '${c.telefono}', '${c.email}', '${c.direccion}')">
+                        <p class="font-bold">${c.nombre}</p>
+                        <p class="text-xs text-slate-400">Cédula: ${c.cedula}</p>
+                    </div>
+                `).join('');
+                panelClientes.classList.remove('hidden');
+            } else { panelClientes.classList.add('hidden'); }
+        });
+
+        function seleccionarCliente(nombre, cedula, telefono, email, direccion) {
+            document.getElementById('cliente-nombre').value = nombre;
+            document.getElementById('cliente-cedula').value = cedula;
+            document.getElementById('cliente-telefono').value = telefono;
+            document.getElementById('cliente-email').value = email;
+            document.getElementById('cliente-direccion').value = direccion;
+            panelClientes.classList.add('hidden');
+        }
+
+        // === 3. BOTÓN AGREGAR ITEM (Cálculos de Línea de Proforma) ===
+        document.getElementById('btn-agregar-producto').addEventListener('click', () => {
+            const codigo = document.getElementById('prod-codigo').value.trim();
+            const descripcion = document.getElementById('prod-descripcion').value.trim();
+            const precio = parseFloat(document.getElementById('prod-precio').value);
+            const descuento = parseFloat(document.getElementById('prod-descuento').value) || 0;
+            const cantidad = parseInt(document.getElementById('prod-cantidad').value) || 1;
+            const porcIV = parseFloat(document.getElementById('prod-iv-porcentaje').value) || 0;
+
+            if (!codigo || !descripcion || isNaN(precio) || precio <= 0 || cantidad <= 0 || porcIV < 0) {
+                alert("Por favor, selecciona un producto válido e ingresa valores correctos.");
+                return;
+            }
+
+            const subtotalLinea = precio * cantidad;
+            const montoDescuento = subtotalLinea * (descuento / 100);
+            const baseImponible = subtotalLinea - montoDescuento;
+            const montoIVLinea = baseImponible * (porcIV / 100);
+            const totalFinalLinea = baseImponible + montoIVLinea;
+
+            productosCotizacion.push({
+                idUnique: Date.now(), codigo, descripcion, precio, descuento, cantidad, porcIV,
+                montoDescuento, montoIV: montoIVLinea, total: totalFinalLinea
+            });
+
+            document.getElementById('prod-codigo').value = '';
+            document.getElementById('prod-descripcion').value = '';
+            document.getElementById('prod-precio').value = '';
+            document.getElementById('prod-descuento').value = '0';
+            document.getElementById('prod-cantidad').value = '1';
+            document.getElementById('prod-iv-porcentaje').value = '13';
+
+            renderizarListaProductos();
+        });
+        // === 4. BUSCADOR DE PRODUCTOS CON CONVERSIÓN DE DIVISAS ===
+        const inputBuscadorProd = document.getElementById('prod-buscador');
+        const panelProductos = document.getElementById('sugerencias-producto');
+
+        inputBuscadorProd.addEventListener('input', (e) => {
+            const buscar = e.target.value.toLowerCase().trim();
+            if (buscar.length < 2) { panelProductos.classList.add('hidden'); return; }
+            const filtrados = BD_PRODUCTOS.filter(p => p.codigo.toLowerCase().includes(buscar) || p.descripcion.toLowerCase().includes(buscar));
+            if (filtrados.length > 0) {
+                panelProductos.innerHTML = filtrados.map(p => `
+                    <div class="p-3 hover:bg-slate-50 cursor-pointer text-sm text-slate-700" 
+                         onclick="seleccionarProducto('${p.codigo}', '${p.descripcion}', ${p.precio}, '${p.monedaBase}')">
+                        <div class="flex justify-between">
+                            <span class="font-bold text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">${p.codigo}</span>
+                            <span class="font-semibold text-slate-600">${p.monedaBase === 'USD' ? '$' : '₡'}${p.precio}</span>
+                        </div>
+                        <p class="text-xs mt-1 font-medium text-slate-600">${p.descripcion}</p>
+                    </div>
+                `).join('');
+                panelProductos.classList.remove('hidden');
+            } else { panelProductos.classList.add('hidden'); }
+        });
+
+        function seleccionarProducto(codigo, descripcion, precio, monedaBase) {
+            document.getElementById('prod-codigo').value = codigo;
+            document.getElementById('prod-descripcion').value = descripcion;
+            monedaArticuloSeleccionado = monedaBase || "USD";
+
+            const monedaDestino = document.getElementById('config-moneda').value;
+            const tipoCambio = parseFloat(document.getElementById('config-tipo-cambio').value) || 1;
+            let precioConvertido = precio;
+
+            if (monedaArticuloSeleccionado === "CRC" && monedaDestino === "USD") { precioConvertido = precio / tipoCambio; }
+            else if (monedaArticuloSeleccionado === "USD" && monedaDestino === "CRC") { precioConvertido = precio * tipoCambio; }
+
+            document.getElementById('prod-precio').value = precioConvertido.toFixed(2);
+            document.getElementById('prod-cantidad').value = 1;
+            document.getElementById('prod-descuento').value = 0;
+            document.getElementById('prod-iv-porcentaje').value = 13;
+            inputBuscadorProd.value = '';
+            panelProductos.classList.add('hidden');
+            document.getElementById('prod-precio').focus();
+        }
+
+        // === 5. COORRECTOR DE IMPRESIÓN DINÁMICA DE TARJETAS (Tags de Descuento e IV Recuperados) ===
+        function renderizarListaProductos() {
+            const txtVacio = document.getElementById('mensaje-vacio-productos');
+            const listaContenedor = document.getElementById('lista-productos');
+
+            if (productosCotizacion.length === 0) {
+                txtVacio.classList.remove('hidden');
+                listaContenedor.classList.add('hidden');
+                calcularTotalesGlobales();
+                return;
+            }
+
+            txtVacio.classList.add('hidden');
+            listaContenedor.classList.remove('hidden');
+
+            const monedaActual = document.getElementById('config-moneda').value;
+            const simbolo = monedaActual === "USD" ? "$" : "₡";
+
+            // Se corrigió el error ortográfico tipográfico en la impresión de las variables
+            listaContenedor.innerHTML = productosCotizacion.map(item => `
+                <div class="bg-white border border-slate-100 rounded-xl p-3 flex justify-between items-center shadow-sm relative overflow-hidden group">
+                    <div class="flex-1 pr-4">
+                        <div class="flex items-center gap-1.5 mb-0.5">
+                            <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded">${item.codigo}</span>
+                            <span class="text-xs font-semibold text-slate-400">x${item.cantidad} un.</span>
+                            <!-- Tag de color morado para ver el IV asignado al ítem -->
+                            <span class="text-[9px] font-bold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded">IV: ${item.porcIV}%</span>
+                        </div>
+                        <p class="text-xs font-bold text-slate-700 truncate max-w-[200px]">${item.descripcion}</p>
+                        <p class="text-[11px] text-slate-400 font-medium mt-0.5">
+                            Precio: ${simbolo}${item.precio.toFixed(2)}
+                            <!-- Tag de color rojo para ver el % de descuento asignado al ítem -->
+                            ${item.descuento > 0 ? `<span class="text-rose-500 font-black ml-1">(-${item.descuento}%)</span>` : ''}
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm font-black text-slate-800">${simbolo}${item.total.toFixed(2)}</span>
+                        <button type="button" onclick="eliminarItemDeCotizacion(${item.idUnique})" class="p-2 bg-rose-50 text-rose-600 rounded-lg cursor-pointer text-xs font-bold">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+
+            calcularTotalesGlobales();
+        }
+
+        function eliminarItemDeCotizacion(idBorrar) {
+            productosCotizacion = productosCotizacion.filter(item => item.idUnique !== idBorrar);
+            renderizarListaProductos();
+        }
+
+        // === 6. SUMATORIA VERTICAL ACUMULADA DE TOTALES ===
+        function calcularTotalesGlobales() {
+            const tarjetaTotales = document.getElementById('tarjeta-totales');
+            if (!tarjetaTotales) return;
+
+            if (productosCotizacion.length === 0) {
+                tarjetaTotales.classList.add('hidden');
+                return;
+            }
+
+            let sumaSubtotalesBrutos = 0;
+            let sumaDescuentosAcumulados = 0;
+            let sumaImpuestosAcumulados = 0;
+
+            productosCotizacion.forEach(item => {
+                sumaSubtotalesBrutos += (item.precio * item.cantidad);
+                sumaDescuentosAcumulados += item.montoDescuento;
+                sumaImpuestosAcumulados += item.montoIV;
+            });
+
+            const netoFinalDocumento = (sumaSubtotalesBrutos - sumaDescuentosAcumulados) + sumaImpuestosAcumulados;
+
+            const monedaActual = document.getElementById('config-moneda').value;
+            const simbolo = monedaActual === "USD" ? "$" : "₡";
+
+            document.getElementById('tot-subtotal').innerText = `${simbolo}${sumaSubtotalesBrutos.toFixed(2)}`;
+            document.getElementById('tot-descuento').innerText = `${simbolo}${sumaDescuentosAcumulados.toFixed(2)}`;
+            document.getElementById('tot-iv-monto').innerText = `${simbolo}${sumaImpuestosAcumulados.toFixed(2)}`;
+            document.getElementById('tot-final').innerText = `${simbolo}${netoFinalDocumento.toFixed(2)}`;
+
+            tarjetaTotales.classList.remove('hidden');
+        }
+
+        // === 7. CONTROLADORES HISTORIAL Y CIERRES ===
+        const inputHistorial = document.getElementById('historial-buscador');
+        const panelHistorial = document.getElementById('historial-resultados');
+
+        if (inputHistorial) {
+            inputHistorial.addEventListener('input', (e) => {
+                const buscar = e.target.value.toLowerCase().trim();
+                if (buscar.length < 1) { panelHistorial.classList.add('hidden'); return; }
+                const filtrados = BD_HISTORIAL.filter(h => h.id.toLowerCase().includes(buscar) || h.cliente.toLowerCase().includes(buscar));
+                if (filtrados.length > 0) {
+                    panelHistorial.innerHTML = filtrados.map(h => `<div class="p-3 text-xs flex justify-between cursor-pointer" onclick="clonarProforma('${h.id}')"><div><p class="font-bold text-blue-600">${h.id}</p><p>${h.cliente}</p></div><p class="font-bold">$${h.total}</p></div>`).join('');
+                    panelHistorial.classList.remove('hidden');
+                } else { panelHistorial.classList.add('hidden'); }
+            });
+        }
+
+        function clonarProforma(id) { alert(`Clonando ${id}`); inputHistorial.value = ''; panelHistorial.classList.add('hidden'); }
+
+        document.getElementById('config-moneda').addEventListener('change', () => { calcularTotalesGlobales(); renderizarListaProductos(); });
+        document.getElementById('btn-limpiar-cliente').addEventListener('click', () => { seleccionarCliente('', '', '', '', ''); });
+
+        document.addEventListener('click', (e) => {
+            if (!inputCliente.contains(e.target)) panelClientes.classList.add('hidden');
+            if (inputBuscadorProd && !inputBuscadorProd.contains(e.target)) panelProductos.classList.add('hidden');
+            if (inputHistorial && !inputHistorial.contains(e.target)) panelHistorial.classList.add('hidden');
+        });    
+    </script>
+
+</body>
+
+</html>

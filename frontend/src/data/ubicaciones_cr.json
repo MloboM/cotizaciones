@@ -1,0 +1,72 @@
+{
+    "provincias": [
+        {
+            "id": "1",
+            "nombre": "San José",
+            "cantones": [
+                {
+                    "id": "101",
+                    "nombre": "San José",
+                    "distritos": [
+                        {
+                            "id": "10101",
+                            "nombre": "Carmen"
+                        },
+                        {
+                            "id": "10102",
+                            "nombre": "Merced"
+                        }
+                    ]
+                },
+                {
+                    "id": "102",
+                    "nombre": "Escazú",
+                    "distritos": [
+                        {
+                            "id": "10201",
+                            "nombre": "Escazú"
+                        },
+                        {
+                            "id": "10202",
+                            "nombre": "San Antonio"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "2",
+            "nombre": "Alajuela",
+            "cantones": [
+                {
+                    "id": "201",
+                    "nombre": "Alajuela",
+                    "distritos": [
+                        {
+                            "id": "20101",
+                            "nombre": "Alajuela"
+                        },
+                        {
+                            "id": "20102",
+                            "nombre": "San José"
+                        }
+                    ]
+                },
+                {
+                    "id": "202",
+                    "nombre": "San Ramón",
+                    "distritos": [
+                        {
+                            "id": "20201",
+                            "nombre": "San Ramón"
+                        },
+                        {
+                            "id": "20202",
+                            "nombre": "Santiago"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

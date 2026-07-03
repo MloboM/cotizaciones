@@ -1,15 +1,17 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
-import { ClientesPage } from '@/features/clientes/ClientesPage'
-
+// Componentes Core de Autenticación y Tenant
 import { AuthProvider } from '@/core/auth/AuthProvider'
 import { AuthGate } from '@/core/auth/AuthGate'
 import { TenantProvider } from '@/core/tenant/TenantProvider'
 import { CompanyProvider } from '@/core/tenant/CompanyProvider'
 
-import { LoginPage } from '@/features/auth/LoginPage'
+// Layout y Vistas
 import { AppLayout } from '@/components/layout/AppLayout'
+import { LoginPage } from '@/features/auth/LoginPage'
+import { ClientesPage } from '@/features/clientes/ClientesPage'
+import { ProductosPage } from '@/features/productos/ProductosPage' // 🟢 Importación Real
 
 // Instancia de QueryClient colocada fuera del componente
 const queryClient = new QueryClient({
@@ -23,7 +25,7 @@ const queryClient = new QueryClient({
 })
 
 // =====================================================================
-// COMPONENTES TEMPORALES DE TRABAJO (FASE 2)
+// COMPONENTES TEMPORALES (Pendientes de construir)
 // =====================================================================
 
 function TempDashboard() {
@@ -33,30 +35,6 @@ function TempDashboard() {
       <p className="text-zinc-500 mt-2 text-sm">
         Fase 2 completada exitosamente. El entorno Multi-Tenant está estable.
       </p>
-    </div>
-  )
-}
-
-// Unificado: Este es tu verdadero catálogo conectado a la base de datos de productos e IA
-function TempCatalogo() {
-  return (
-    <div className="bg-white p-8 rounded-2xl shadow-sm border border-zinc-200 max-w-4xl mx-auto mt-6">
-      <div className="flex items-center justify-between border-b border-zinc-100 pb-4">
-        <div>
-          <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Catálogo de Productos</h1>
-          <p className="text-zinc-500 mt-1 text-sm">
-            Gestión de inventario base y búsqueda semántica con Embedded AI habilitada.
-          </p>
-        </div>
-        <span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-600/20 animate-pulse">
-          pgvector Listo
-        </span>
-      </div>
-
-      {/* Marcador de posición para la tabla TanStack de productos */}
-      <div className="mt-8 border-2 border-dashed border-zinc-200 rounded-xl h-64 flex items-center justify-center bg-zinc-50/50">
-        <p className="text-sm text-zinc-400">Aquí se conectará la tabla de productos y el motor de embeddings en la Fase 4</p>
-      </div>
     </div>
   )
 }
@@ -91,7 +69,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <BrowserRouter>
+        <BrowserRouter basename="/cotizaciones">
           <Routes>
             {/* RUTA PÚBLICA */}
             <Route path="/login" element={<LoginPage />} />
@@ -109,10 +87,11 @@ export default function App() {
               }
             >
               <Route path="/dashboard" element={<TempDashboard />} />
-              <Route path="/clientes" element={<ClientesPage />} /> {/* Tu CRM Real */}
+              <Route path="/clientes" element={<ClientesPage />} />
 
-              {/* Rutas alineadas perfectamente con tu menú de Asana-Style */}
-              <Route path="/catalogo" element={<TempCatalogo />} />
+              {/* 🟢 Ruta del Catálogo ahora apuntando a su Página Real */}
+              <Route path="/catalogo" element={<ProductosPage />} />
+
               <Route path="/cotizaciones" element={<TempCotizaciones />} />
               <Route path="/configuracion" element={<TempConfiguracion />} />
 

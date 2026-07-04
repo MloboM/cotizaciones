@@ -19,6 +19,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 import { productoSchema, type ProductoFormValues } from "./producto-schema"
 import { supabase } from "@/services/supabase/client"
+import { SearchableCombobox } from "@/components/ui/searchable-combobox"
+import { useTenant } from "@/hooks/useTenant"
 
 interface ProductoWorkspaceProps {
     productoToEdit?: any | null
@@ -31,6 +33,7 @@ export function ProductoForm({ productoToEdit, initialData, onSuccess, onCancel 
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [activeTab, setActiveTab] = useState("general")
 
+    const { empresaId, loadingTenant } = useTenant()
     // ESTADOS PARA GUARDAR LOS DATOS REALES DE LA BD
     const [catalogos, setCatalogos] = useState({
         categorias: [] as any[],
@@ -39,16 +42,27 @@ export function ProductoForm({ productoToEdit, initialData, onSuccess, onCancel 
         gruposFiscales: [] as any[]
     })
     const [isFetchingCatalogs, setIsFetchingCatalogs] = useState(true)
-
+    const [categoriasOptions, setCategoriasOptions] = useState<{ label: string; value: string }[]>([])
+    const [marcasOptions, setMarcasOptions] = useState<{ label: string; value: string }[]>([])
+    // FETCH DE DATOS REALES (SEEDS)
     // FETCH DE DATOS REALES (SEEDS)
     useEffect(() => {
+        if (!loadingTenant && !empresaId) {
+            console.error("ALERTA SEGURIDAD: El usuario no tiene un empresa_id asignado en la BD.");
+            setIsFetchingCatalogs(false);
+            return;
+        }
+
+        // 2. Cláusula de guarda normal: Esperar a que la sesión resuelva la empresa
+        if (!empresaId) return
+
         async function cargarCatalogosBase() {
             try {
                 const [resCat, resMar, resUom, resGf] = await Promise.all([
-                    supabase.from('categorias_producto').select('id, nombre').order('nombre'),
-                    supabase.from('marcas').select('id, nombre').order('nombre'),
-                    supabase.from('unidades_medida').select('id, codigo, nombre').order('nombre'),
-                    supabase.from('grupos_fiscales').select('id, codigo, nombre, porcentaje').order('porcentaje')
+                    supabase.from('categorias_producto').select('id, nombre').eq('empresa_id', empresaId).order('nombre'),
+                    supabase.from('marcas').select('id, nombre').eq('empresa_id', empresaId).order('nombre'),
+                    supabase.from('unidades_medida').select('id, codigo, nombre').eq('empresa_id', empresaId).order('nombre'),
+                    supabase.from('grupos_fiscales').select('id, codigo, nombre, porcentaje').eq('empresa_id', empresaId).order('porcentaje')
                 ])
 
                 setCatalogos({
@@ -57,16 +71,22 @@ export function ProductoForm({ productoToEdit, initialData, onSuccess, onCancel 
                     unidades: resUom.data || [],
                     gruposFiscales: resGf.data || []
                 })
+
+                // Formateo específico para el nuevo SearchableCombobox { label, value }
+                setCategoriasOptions((resCat.data || []).map(c => ({ label: c.nombre, value: c.id })))
+                setMarcasOptions((resMar.data || []).map(m => ({ label: m.nombre, value: m.id })))
+
             } catch (error) {
                 console.error("Error cargando catálogos:", error)
             } finally {
                 setIsFetchingCatalogs(false)
             }
         }
-        cargarCatalogosBase()
-    }, [])
 
-    // 🚀 TRADUCCIÓN INVERSA DE ENUMS (Backend -> Frontend)
+        cargarCatalogosBase()
+    }, [empresaId, loadingTenant])
+
+    // TRADUCCIÓN INVERSA DE ENUMS (Backend -> Frontend)
     const dbTipo = initialData?.tipo_producto || initialData?.tipo_item || productoToEdit?.tipo_producto || productoToEdit?.tipo_item;
     const tipoItemMapeado = dbTipo === 'fisico' ? 'producto_fisico' : (dbTipo || 'producto_fisico');
 
@@ -86,7 +106,7 @@ export function ProductoForm({ productoToEdit, initialData, onSuccess, onCancel 
             descripcion_larga: initialData?.descripcion_larga || productoToEdit?.descripcion_larga || "",
             estado: initialData ? "activo" : (productoToEdit?.activo === false ? "inactivo" : (productoToEdit?.estado || "activo")),
 
-            // 🚀 EL TRADUCTOR: Mapea los nombres de Supabase a los de tu Formulario 🚀
+            //  EL TRADUCTOR: Mapea los nombres de Supabase a los de tu Formulario 
 
             // 1. Catálogos Maestros (Estos faltaban en tu archivo)
             categoria_id: initialData?.categoria_id || productoToEdit?.categoria_id || "",
@@ -107,7 +127,7 @@ export function ProductoForm({ productoToEdit, initialData, onSuccess, onCancel 
             // costo_promedio: initialData?.costo_promedio || productoToEdit?.costo_promedio || 0,
             // ultima_compra: initialData?.ultima_compra || productoToEdit?.ultima_compra || 0,
 
-            // 🚀 FIN DEL TRADUCTOR 🚀
+            // FIN DEL TRADUCTOR 
 
             es_vendible: initialData?.es_vendible ?? productoToEdit?.es_vendible ?? true,
             permite_descuento: initialData?.permite_descuento ?? productoToEdit?.permite_descuento ?? true,
@@ -295,7 +315,14 @@ export function ProductoForm({ productoToEdit, initialData, onSuccess, onCancel 
             </div>
         )
     }
-
+    if (loadingTenant) {
+        return (
+            <div className="h-64 flex flex-col items-center justify-center space-y-3 bg-zinc-50/50 rounded-xl border border-dashed border-zinc-200">
+                <Loader2 className="h-7 w-7 animate-spin text-indigo-600" />
+                <span className="text-sm font-medium text-zinc-500">Validando entorno seguro...</span>
+            </div>
+        )
+    }
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-8 flex flex-col h-full">
@@ -402,31 +429,37 @@ export function ProductoForm({ productoToEdit, initialData, onSuccess, onCancel 
                                     </FormItem>
                                 )} />
 
+                                {/* REEMPLAZO PARA CATEGORÍA */}
                                 <FormField control={form.control} name="categoria_id" render={({ field }) => (
-                                    <FormItem><FormLabel className="text-[13px] font-medium text-zinc-500">Categoría Maestra</FormLabel>
-                                        <Select onValueChange={field.onChange} value={field.value}>
-                                            <FormControl><SelectTrigger className="bg-white border-zinc-300 focus:ring-indigo-500/20 focus:border-indigo-500 rounded-md shadow-sm h-9 text-sm"><SelectValue placeholder="Seleccionar..." /></SelectTrigger></FormControl>
-                                            <SelectContent className="bg-white border-zinc-200">
-                                                {catalogos.categorias.map(cat => (
-                                                    <SelectItem key={cat.id} value={cat.id}>{cat.nombre}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage className="text-xs" />
+                                    <FormItem className="flex flex-col">
+                                        <FormLabel className="text-[13px] font-medium text-zinc-700">Categoría del Sector</FormLabel>
+                                        <FormControl>
+                                            <SearchableCombobox
+                                                options={categoriasOptions}
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                placeholder="Buscar o filtrar categoría..."
+                                                emptyText="Categoría no encontrada."
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
                                     </FormItem>
                                 )} />
 
+                                {/* REEMPLAZO PARA MARCA */}
                                 <FormField control={form.control} name="marca_id" render={({ field }) => (
-                                    <FormItem><FormLabel className="text-[13px] font-medium text-zinc-500">Marca Comercial</FormLabel>
-                                        <Select onValueChange={field.onChange} value={field.value}>
-                                            <FormControl><SelectTrigger className="bg-white border-zinc-300 focus:ring-indigo-500/20 focus:border-indigo-500 rounded-md shadow-sm h-9 text-sm"><SelectValue placeholder="Seleccionar..." /></SelectTrigger></FormControl>
-                                            <SelectContent className="bg-white border-zinc-200">
-                                                {catalogos.marcas.map(marca => (
-                                                    <SelectItem key={marca.id} value={marca.id}>{marca.nombre}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage className="text-xs" />
+                                    <FormItem className="flex flex-col">
+                                        <FormLabel className="text-[13px] font-medium text-zinc-700">Fabricante / Marca</FormLabel>
+                                        <FormControl>
+                                            <SearchableCombobox
+                                                options={marcasOptions}
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                placeholder="Buscar o filtrar fabricante..."
+                                                emptyText="Fabricante no encontrado."
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
                                     </FormItem>
                                 )} />
 
@@ -552,17 +585,23 @@ export function ProductoForm({ productoToEdit, initialData, onSuccess, onCancel 
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                 <FormField control={form.control} name="unidad_medida_id" render={({ field }) => (
-                                    <FormItem><FormLabel className="text-[13px] font-medium text-zinc-500">Unidad de Medida (UoM) *</FormLabel>
-                                        <Select onValueChange={field.onChange} value={field.value}>
-                                            <FormControl><SelectTrigger className="bg-white border-l-4 border-l-red-500 border-zinc-300 focus:ring-red-500/20 focus:border-red-500 rounded-md shadow-sm h-9 text-sm"><SelectValue placeholder="Seleccionar unidad..." /></SelectTrigger></FormControl>
-                                            <SelectContent className="bg-white border-zinc-200">
-                                                {unidadesFiltradas.map(uom => (
-                                                    <SelectItem key={uom.id} value={uom.id}>
-                                                        {uom.nombre} ({uom.codigo})
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                    <FormItem>
+                                        <FormLabel className="text-[13px] font-medium text-zinc-500">Unidad de Medida (UoM) *</FormLabel>
+                                        <FormControl>
+                                            {/* Contenedor que preserva tu borde rojo lateral de campo obligatorio */}
+                                            <div className="border-l-4 border-l-red-500 rounded-md shadow-sm overflow-hidden">
+                                                <SearchableCombobox
+                                                    options={unidadesFiltradas.map(uom => ({
+                                                        label: `${uom.nombre} (${uom.codigo})`,
+                                                        value: uom.id
+                                                    }))}
+                                                    value={field.value}
+                                                    onChange={field.onChange}
+                                                    placeholder="Seleccionar unidad..."
+                                                    emptyText="Unidad no encontrada."
+                                                />
+                                            </div>
+                                        </FormControl>
                                         <FormMessage className="text-xs" />
                                     </FormItem>
                                 )} />

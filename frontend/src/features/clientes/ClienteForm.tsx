@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Loader2, Building2, MapPin, Contact, CreditCard, Search } from "lucide-react"
+import { Loader2, Building2, MapPin, Contact, CreditCard } from "lucide-react"
 
 import ubicacionesCR from "@/data/ubicaciones_cr.json"
 

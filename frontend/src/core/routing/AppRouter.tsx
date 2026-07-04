@@ -31,8 +31,7 @@ export function AppRouter() {
 
                         {/* 2. RUTAS PROTEGIDAS (Requieren Login) */}
                         {/* El Layout envuelve a TODAS estas rutas. El <Outlet /> mostrará el contenido */}
-                        <Route element={<RBACGuard><AppLayout /></RBACGuard>}>
-
+                        <Route element={<RBACGuard allowedRoles={['admin', 'vendedor']}><AppLayout /></RBACGuard>}>
                             {/* Redirección por defecto si entran a la raíz */}
                             <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
